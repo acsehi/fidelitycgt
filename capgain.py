@@ -18,7 +18,7 @@ def exchangetoGBP(date):
             else:
                 raise ex
     else:
-        return ex(date.strftime('%Y-%m-%d'))
+        return exchange(date.strftime('%Y-%m-%d'))
 
 def parse_xml(xml):
     """Parse XML file into a list of lists"""
@@ -40,6 +40,10 @@ def exchangeHMRC(date):
         print(url + " downloaded")
         return parse_xml(f.read().decode('utf-8'))
 
+def validateCurrency(row):
+    if (row[0] == "The values are displayed in GBP"):
+        raise Exception("Please download history in USD")
+
 date_open = []
 quantity_open = []
 value_open = []
@@ -52,8 +56,8 @@ with open('View open lots.csv') as open_csv:
             date_open.append(d)
             quantity_open.append(row[1])
             value_open.append(float(row[3])*float(exchange_rate))
-        elif (row[0] == "The values are displayed in GBP"):
-            raise Exception("Please download history in USD")
+        else:
+            validateCurrency(row)
 
 date_close = []
 quantity_close = []
@@ -80,8 +84,8 @@ with open('View closed lots.csv') as open_csv:
             quantity_close.append(row[1])
             cost = float(row[3])/float(row[1])
             cost_close.append(cost*float(exchange_rate_sell))
-        elif (row[0] == "The values are displayed in GBP"):
-            raise Exception("Please download history in USD")
+        else:
+            validateCurrency(row)
 
 with open('cgt.tsv', 'w', newline='',) as csvfile:
     fieldnames = ['Action', 'Date', 'Stock_Name',
