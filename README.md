@@ -1,6 +1,9 @@
 # Fidelity UK Capital tax gain calculator for MSFT employees
 Calculate your capital tax gain from MSFT shares from your Fidelity account using http://cgtcalculator.com/. This tool will convert your fidelity transaction export to format readable by http://cgtcalculator.com/. Trades are converted back to GBP on historical rates. All outputs are in GBP.
 
+## ESPP
+If you bought ESPP stocks, their Fair Market Value will be used. This will overestimate your gains by 11% for ESPP shares. You can manually fix this in the output, our you can just accept that your reported capital gains are 0-10% less than what was calculated.
+
 ## Instructions
 1. Login to fideliy and navigate to https://netbenefitsww.fidelity.com/mybenefitsww/stockplans/navigation/PositionSummary#/
 2. Select "View share details" for your MSFT stocks
