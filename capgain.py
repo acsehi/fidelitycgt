@@ -1,2 +1,2 @@
-from capgainCalculator import Execute
+from capgainCalculator import run
 run()
