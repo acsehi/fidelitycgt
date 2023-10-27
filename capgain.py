@@ -5,6 +5,8 @@ import urllib.request
 import json
 import xml.etree.ElementTree as ET
 
+accessKey=""
+
 exchangeTraded = True
 use_HMRC_exchange_rates = True
 
@@ -31,7 +33,7 @@ def parse_xml(xml):
             return row.find('rateNew').text
 
 def exchange(date):
-    url = 'https://api.exchangerate.host/'+date+'?base=USD&symbols=GBP'
+    url = 'https://api.exchangerate.host/'+date+'?base=USD&symbols=GBP&access_key='+accessKey
     with urllib.request.urlopen(url) as f:
         r = json.loads(f.read().decode('utf-8'))
         exchange_rate = r["rates"]["GBP"]
@@ -71,30 +73,36 @@ date_close = []
 quantity_close = []
 cost_close = []
 with open('View closed lots.csv') as open_csv:
+    # Row schema: Date acquired,Quantity,Date sold or transferred,Proceeds,Cost basis,Gain/loss,Term
     reader = csv.reader(open_csv, delimiter=',')
     for row in reader:
-        if (len(row) > 2 and row[1] != "Quantity"):
+        if (len(row) > 2 and row[1] != "Quantity"):            
             # buy
+            quantity = float(row[1])
+            buy_date = row[0]
             do = datetime.datetime.strptime(
-                row[0], '%b/%d/%Y').strftime('%d/%m/%Y')
+                buy_date, '%b/%d/%Y').strftime('%d/%m/%Y')
 
             exchange_rate_buy = exchangetoGBP(
-                datetime.datetime.strptime(row[0], '%b/%d/%Y'))
+                datetime.datetime.strptime(buy_date, '%b/%d/%Y'))
 
             date_open.append(do)
-            quantity_open.append(row[1])
+            quantity_open.append(quantity)
+            cost_basis = row[4]
             value_open.append(
-                (float(row[3])/float(row[1]))*float(exchange_rate_buy))
+                (float(cost_basis)/float(quantity))*float(exchange_rate_buy))
 
             # sell
+            sell_date = row[2]
             dc = datetime.datetime.strptime(
-                row[2], '%b/%d/%Y').strftime('%d/%m/%Y')
+                sell_date, '%b/%d/%Y').strftime('%d/%m/%Y')
             exchange_rate_sell = exchangetoGBP(
-                datetime.datetime.strptime(row[0], '%b/%d/%Y'))
+                datetime.datetime.strptime(sell_date, '%b/%d/%Y'))
 
             date_close.append(dc)
-            quantity_close.append(row[1])
-            cost = float(row[3])/float(row[1])
+            quantity_close.append(quantity)
+            proceeds = row[3]
+            cost = float(proceeds)/float(quantity)
             cost_close.append(cost*float(exchange_rate_sell))
         else:
             validateCurrency(row)
