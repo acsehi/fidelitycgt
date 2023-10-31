@@ -5,8 +5,11 @@ from capgainCalculator import run
 
 class TestCapGain(unittest.TestCase):
     def test_exchangeHMRC(self):
-        run(os.path.normpath('tests\View open lots.csv'), os.path.normpath('tests\View closed lots.csv'),
-            os.path.normpath('tests\cgt.tsv'), os.path.normpath('tests\exchange_rate_cache.json'))
+        run(os.path.join('tests', 'View open lots.csv'), 
+        os.path.join('tests', 'View closed lots.csv'),
+        os.path.join('tests', 'cgt.tsv'), 
+        os.path.join('tests', 'exchange_rate_cache.json'))
+                
         lines = self.readFileLines('tests\cgt.tsv')
 
         self.assertEqual(lines[0], 'B\t31/08/2023\tMSFT\t10\t150.0\t0\t0\n')
