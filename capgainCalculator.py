@@ -72,8 +72,11 @@ def save_exchange_rates(exchange_rate_cache):
 
 
 def load_exchange_rates():
-    with open('exchange_rate_cache.json') as json_file:
-        return json.load(json_file)
+    try:
+        with open('exchange_rate_cache.json') as json_file:
+            return json.load(json_file)
+    except FileNotFoundError:
+        return {}    
 
 
 def validate_currency(row):
