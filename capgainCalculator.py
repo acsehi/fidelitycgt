@@ -10,24 +10,22 @@ trial_base64 = "c36cefa5b34520b268302b35c738e5ba"
 
 use_exchange = True
 use_HMRC_exchange_rates = True
-exchange_rate_cache = {}
 
-
-def convert_to_gbp(date):
+def convert_to_gbp(date, exchange_rate_cache):
     if (not (use_exchange)):
         return 1.0
     if (use_HMRC_exchange_rates):
         try:
-            return exchange_HMRC(date.strftime('%m%y'))
+            return exchange_HMRC(date.strftime('%m%y'), exchange_rate_cache)
         except Exception as ex:
             if (ex.code == 404):
                 print(
                     'HMRC don\'t have data before 2015-01-01, reverting back to daily exchange rates')
-                return exchange(date.strftime('%Y-%m-%d'))
+                return exchange(date.strftime('%Y-%m-%d'), exchange_rate_cache)
             else:
                 raise ex
     else:
-        return exchange(date.strftime('%Y-%m-%d'))
+        return exchange(date.strftime('%Y-%m-%d'), exchange_rate_cache)
 
 
 def parse_xml(xml):
@@ -38,7 +36,7 @@ def parse_xml(xml):
             return row.find('rateNew').text
 
 
-def exchange(date):
+def exchange(date, exchange_rate_cache):
     if (date in exchange_rate_cache):
         print("Using cached exchange rate for " + date)
         return exchange_rate_cache[date]
@@ -53,7 +51,7 @@ def exchange(date):
         return exchange_rate
 
 
-def exchange_HMRC(date):
+def exchange_HMRC(date, exchange_rate_cache):
     if (date in exchange_rate_cache):
         print("Using cached exchange rate for " + date)
         return exchange_rate_cache[date]
@@ -66,14 +64,14 @@ def exchange_HMRC(date):
         return exchange_rate
 
 
-def save_exchange_rates(exchange_rate_cache):
-    with open('exchange_rate_cache.json', 'w') as fp:
+def save_exchange_rates(exchange_rate_cache_file, exchange_rate_cache):
+    with open(exchange_rate_cache_file, 'w') as fp:
         json.dump(exchange_rate_cache, fp)
 
 
-def load_exchange_rates():
+def load_exchange_rates(exchange_rate_cache_file):
     try:
-        with open('exchange_rate_cache.json') as json_file:
+        with open(exchange_rate_cache_file) as json_file:
             return json.load(json_file)
     except FileNotFoundError:
         return {}    
@@ -84,21 +82,19 @@ def validate_currency(row):
         raise Exception("Please download history in USD")
 
 
-date_open = []
-quantity_open = []
-value_open = []
-exchange_rate_cache = load_exchange_rates()
-
-
-def run():
-    with open('View open lots.csv') as open_csv:
+def run(open_lots_file, closed_lots_file, output_file, exchange_rate_cache_file):
+    date_open = []
+    quantity_open = []
+    value_open = []
+    exchange_rate_cache = load_exchange_rates(exchange_rate_cache_file)
+    with open(open_lots_file) as open_csv:
         reader = csv.reader(open_csv, delimiter=',')
         for row in reader:
             if (len(row) > 2 and row[1] != "Quantity"):
                 d = datetime.datetime.strptime(
                     row[0], '%b-%d-%Y').strftime('%d/%m/%Y')
                 exchange_rate = convert_to_gbp(
-                    datetime.datetime.strptime(row[0], '%b-%d-%Y'))
+                    datetime.datetime.strptime(row[0], '%b-%d-%Y'), exchange_rate_cache)
                 date_open.append(d)
                 quantity_open.append(row[1])
                 value_open.append(float(row[3])*float(exchange_rate))
@@ -108,7 +104,7 @@ def run():
     date_close = []
     quantity_close = []
     cost_close = []
-    with open('View closed lots.csv') as open_csv:
+    with open(closed_lots_file) as open_csv:
         # Row schema: Date acquired,Quantity,Date sold or transferred,Proceeds,Cost basis,Gain/loss,Term
         reader = csv.reader(open_csv, delimiter=',')
         for row in reader:
@@ -120,7 +116,7 @@ def run():
                     buy_date, '%b/%d/%Y').strftime('%d/%m/%Y')
 
                 exchange_rate_buy = convert_to_gbp(
-                    datetime.datetime.strptime(buy_date, '%b/%d/%Y'))
+                    datetime.datetime.strptime(buy_date, '%b/%d/%Y'), exchange_rate_cache)
 
                 date_open.append(do)
                 quantity_open.append(quantity)
@@ -133,7 +129,7 @@ def run():
                 dc = datetime.datetime.strptime(
                     sell_date, '%b/%d/%Y').strftime('%d/%m/%Y')
                 exchange_rate_sell = convert_to_gbp(
-                    datetime.datetime.strptime(sell_date, '%b/%d/%Y'))
+                    datetime.datetime.strptime(sell_date, '%b/%d/%Y'), exchange_rate_cache)
 
                 date_close.append(dc)
                 quantity_close.append(quantity)
@@ -143,7 +139,7 @@ def run():
             else:
                 validate_currency(row)
 
-    with open('cgt.tsv', 'w', newline='',) as csvfile:
+    with open(output_file, 'w', newline='',) as csvfile:
         fieldnames = ['Action', 'Date', 'Stock_Name',
                       'Quantity', 'price', 'brokercost', 'tax']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter='\t')
@@ -155,4 +151,4 @@ def run():
             writer.writerow({'Action': 'S', 'Date': date_close[c], 'Stock_Name': 'MSFT',
                             'Quantity': quantity_close[c], 'price': cost_close[c], 'brokercost': '0', 'tax': '0'})
 
-    save_exchange_rates(exchange_rate_cache)
+    save_exchange_rates(exchange_rate_cache_file, exchange_rate_cache)

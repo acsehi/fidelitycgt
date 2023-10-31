@@ -4,8 +4,8 @@ from capgainCalculator import run
 
 class TestCapGain(unittest.TestCase):
     def test_exchangeHMRC(self):
-        run()
-        lines = self.readFileLines('cgt.tsv')
+        run('tests\View open lots.csv', 'tests\View closed lots.csv','tests\cgt.tsv', 'tests\exchange_rate_cache.json')
+        lines = self.readFileLines('tests\cgt.tsv')
 
         self.assertEqual(lines[0], 'B\t31/08/2023\tMSFT\t10\t150.0\t0\t0\n')
         self.assertEqual(lines[1], 'B\t28/02/2019\tMSFT\t10.0\t200.0\t0\t0\n')
