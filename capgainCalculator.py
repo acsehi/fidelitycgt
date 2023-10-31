@@ -11,6 +11,7 @@ trial_base64 = "c36cefa5b34520b268302b35c738e5ba"
 use_exchange = True
 use_HMRC_exchange_rates = True
 
+
 def convert_to_gbp(date, exchange_rate_cache):
     if (not (use_exchange)):
         return 1.0
@@ -74,7 +75,7 @@ def load_exchange_rates(exchange_rate_cache_file):
         with open(exchange_rate_cache_file) as json_file:
             return json.load(json_file)
     except FileNotFoundError:
-        return {}    
+        return {}
 
 
 def validate_currency(row):
