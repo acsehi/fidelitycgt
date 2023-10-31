@@ -5,8 +5,8 @@ from capgainCalculator import run
 
 class TestCapGain(unittest.TestCase):
     def test_exchangeHMRC(self):
-        run(os.path.join(os.getcwd(), 'tests', 'View open lots.csv'),
-            os.path.join(os.getcwd(), 'tests', 'View closed lots.csv'),
+        run(os.path.join(os.getcwd(), 'tests', 'open.csv'),
+            os.path.join(os.getcwd(), 'tests', 'closed.csv'),
             os.path.join(os.getcwd(), 'tests', 'cgt.tsv'),
             os.path.join(os.getcwd(), 'tests', 'exchange_rate_cache.json'))
 
