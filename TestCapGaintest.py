@@ -1,11 +1,17 @@
+import os
 import unittest
 from capgainCalculator import run
 
 
 class TestCapGain(unittest.TestCase):
     def test_exchangeHMRC(self):
-        run()
-        lines = self.readFileLines('cgt.tsv')
+        run(os.path.join(os.getcwd(), 'Tests', 'open.csv'),
+            os.path.join(os.getcwd(), 'Tests', 'closed.csv'),
+            os.path.join(os.getcwd(), 'Tests', 'cgt.tsv'),
+            os.path.join(os.getcwd(), 'Tests', 'exchange_rate_cache.json'))
+
+        lines = self.readFileLines(
+            os.path.join(os.getcwd(), 'Tests', 'cgt.tsv'))
 
         self.assertEqual(lines[0], 'B\t31/08/2023\tMSFT\t10\t150.0\t0\t0\n')
         self.assertEqual(lines[1], 'B\t28/02/2019\tMSFT\t10.0\t200.0\t0\t0\n')
