@@ -17,7 +17,7 @@ def convert_to_gbp(date, exchange_rate_cache):
         return 1.0
     if (use_HMRC_exchange_rates):
         try:
-            return exchange_HMRC(date.strftime('%m%y'), exchange_rate_cache)
+            return exchange_HMRC(date.strftime('%Y-%m'), exchange_rate_cache)
         except Exception as ex:
             if (ex.code == 404):
                 print(
@@ -43,6 +43,7 @@ def exchange(date, exchange_rate_cache):
         return exchange_rate_cache[date]
     url = 'http://api.exchangerate.host/convert?access_key=' + \
         trial_base64+'&from=USD&to=GBP&amount=1&date=' + date
+    
     with urllib.request.urlopen(url) as f:
         r = json.loads(f.read().decode('utf-8'))
         exchange_rate = r["result"]
@@ -56,8 +57,9 @@ def exchange_HMRC(date, exchange_rate_cache):
     if (date in exchange_rate_cache):
         print("Using cached exchange rate for " + date)
         return exchange_rate_cache[date]
-
-    url = 'https://www.hmrc.gov.uk/softwaredevelopers/rates/exrates-monthly-'+date+'.XML'
+    
+    url = 'https://www.trade-tariff.service.gov.uk/api/v2/exchange_rates/files/monthly_xml_'+date+'.xml'
+    
     with urllib.request.urlopen(url) as f:
         exchange_rate = 1.0/float(parse_xml(f.read().decode('utf-8')))
         exchange_rate_cache[date] = exchange_rate
@@ -81,7 +83,6 @@ def load_exchange_rates(exchange_rate_cache_file):
 def validate_currency(row):
     if (row[0] == "The values are displayed in GBP"):
         raise Exception("Please download history in USD")
-
 
 def run(open_lots_file, closed_lots_file, output_file, exchange_rate_cache_file):
     date_open = []
