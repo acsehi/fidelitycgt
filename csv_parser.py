@@ -4,14 +4,12 @@ import csv
 from datetime import datetime
 from typing import List, Tuple
 
+from config import Config
 from models import FidelityOpenLot, FidelityClosedLot
 
 
 class FidelityCSVParser:
     """Parser for Fidelity CSV export files."""
-
-    # Expected currency in the CSV files
-    EXPECTED_CURRENCY = "USD"
 
     @staticmethod
     def _validate_currency(row: List[str]) -> None:
@@ -24,8 +22,8 @@ class FidelityCSVParser:
         Raises:
             ValueError: If the file is in GBP instead of USD
         """
-        if len(row) > 0 and row[0] == "The values are displayed in GBP":
-            raise ValueError("Please download history in USD, not GBP")
+        if len(row) > 0 and row[0] == f"The values are displayed in GBP":
+            raise ValueError(f"Please download history in {Config.EXPECTED_CURRENCY}, not GBP")
 
     @staticmethod
     def parse_open_lots(file_path: str) -> List[FidelityOpenLot]:

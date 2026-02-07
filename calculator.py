@@ -9,6 +9,7 @@ exchange rates.
 import csv
 from typing import List
 
+from config import Config
 from models import Transaction
 from exchange_rate_service import ExchangeRateService
 from csv_parser import FidelityCSVParser
@@ -16,8 +17,6 @@ from csv_parser import FidelityCSVParser
 
 class CapitalGainCalculator:
     """Calculator for capital gains tax from Fidelity stock transactions."""
-
-    STOCK_NAME = "MSFT"
 
     def __init__(self, exchange_rate_cache_file: str, use_hmrc_rates: bool = True):
         """
@@ -61,7 +60,7 @@ class CapitalGainCalculator:
             transaction = Transaction(
                 action='B',
                 date=lot.date_acquired,
-                stock_name=self.STOCK_NAME,
+                stock_name=Config.STOCK_NAME,
                 quantity=lot.quantity,
                 price_gbp=price_gbp
             )
@@ -77,7 +76,7 @@ class CapitalGainCalculator:
             buy_transaction = Transaction(
                 action='B',
                 date=lot.date_acquired,
-                stock_name=self.STOCK_NAME,
+                stock_name=Config.STOCK_NAME,
                 quantity=lot.quantity,
                 price_gbp=price_gbp_buy
             )
@@ -91,7 +90,7 @@ class CapitalGainCalculator:
             sell_transaction = Transaction(
                 action='S',
                 date=lot.date_sold,
-                stock_name=self.STOCK_NAME,
+                stock_name=Config.STOCK_NAME,
                 quantity=lot.quantity,
                 price_gbp=price_gbp_sell
             )

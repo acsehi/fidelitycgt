@@ -7,16 +7,11 @@ from datetime import datetime
 from typing import Dict, Optional
 from urllib.error import HTTPError, URLError
 
+from config import Config
+
 
 class ExchangeRateService:
     """Service for fetching and caching exchange rates from various sources."""
-
-    # API key for exchangerate.host (should be moved to environment variable in production)
-    EXCHANGE_RATE_API_KEY = "c36cefa5b34520b268302b35c738e5ba"
-    
-    # API endpoints
-    HMRC_API_URL = "https://www.trade-tariff.service.gov.uk/api/v2/exchange_rates/files/monthly_xml_{date}.xml"
-    EXCHANGE_HOST_API_URL = "http://api.exchangerate.host/convert?access_key={api_key}&from=USD&to=GBP&amount=1&date={date}"
 
     def __init__(self, cache_file: str, use_hmrc: bool = True):
         """
@@ -84,7 +79,7 @@ class ExchangeRateService:
             print(f"Using cached HMRC exchange rate for {date_key}")
             return self.cache[date_key]
         
-        url = self.HMRC_API_URL.format(date=date_key)
+        url = Config.HMRC_API_URL.format(date=date_key)
         
         try:
             with urllib.request.urlopen(url) as response:
@@ -113,8 +108,8 @@ class ExchangeRateService:
             print(f"Using cached exchange rate for {date_key}")
             return self.cache[date_key]
         
-        url = self.EXCHANGE_HOST_API_URL.format(
-            api_key=self.EXCHANGE_RATE_API_KEY,
+        url = Config.EXCHANGE_HOST_API_URL.format(
+            api_key=Config.EXCHANGE_RATE_API_KEY,
             date=date_key
         )
         

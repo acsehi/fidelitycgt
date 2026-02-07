@@ -1,0 +1,8 @@
+# Fidelity CGT Calculator Requirements
+# All dependencies are part of Python 3.12+ standard library
+
+# Python 3.12 or higher required
+# No external dependencies needed for core functionality
+
+# Optional: For development
+# pytest>=7.0.0  # For running tests with pytest instead of unittest
