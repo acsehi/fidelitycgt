@@ -32,7 +32,9 @@ If you want to simulate a hypotetical sell transaction, just copy-paste an exist
 ## Configuration
 
 You can customize the behavior by setting environment variables:
-- `EXCHANGE_RATE_API_KEY`: Your API key for exchangerate.host (optional, has a default)
+- `EXCHANGE_RATE_API_KEY`: Your API key for exchangerate.host (optional, has a free-tier default)
+  - The included API key is for the free tier and only used as a fallback when HMRC data is unavailable (pre-2015)
+  - HMRC rates are preferred and used by default for all transactions from 2015 onwards
 
 See [config.py](config.py) for all configuration options.
 

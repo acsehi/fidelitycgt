@@ -9,9 +9,13 @@ class Config:
     
     # Exchange rate settings
     USE_HMRC_RATES: bool = True
+    
+    # Note: This is a free-tier API key for exchangerate.host
+    # Users can override with their own key via EXCHANGE_RATE_API_KEY environment variable
+    # The API key is used as fallback when HMRC data is unavailable (pre-2015)
     EXCHANGE_RATE_API_KEY: str = os.getenv(
         'EXCHANGE_RATE_API_KEY',
-        'c36cefa5b34520b268302b35c738e5ba'  # Default API key (consider using environment variable)
+        'c36cefa5b34520b268302b35c738e5ba'  # Free tier API key (fallback only)
     )
     
     # Stock symbol

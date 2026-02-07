@@ -35,4 +35,6 @@ cgt.tsv
 
 # Test outputs
 Tests/cgt.tsv
+Tests/cgt_fractional.tsv
 Tests/exchange_rate_cache.json
+Tests/exchange_rate_cache_fractional.json
