@@ -1,4 +1,18 @@
 # http://cgtcalculator.com/
+# 
+# DEPRECATED: This module is deprecated and maintained only for backward compatibility.
+# Please use the new modular structure:
+#   - calculator.py: Main calculation logic
+#   - exchange_rate_service.py: Exchange rate handling
+#   - csv_parser.py: CSV file parsing
+#   - models.py: Data models
+#
+# To migrate, simply change:
+#   from capgainCalculator import run
+# to:
+#   from calculator import run
+#
+
 import csv
 import datetime
 import urllib.request
